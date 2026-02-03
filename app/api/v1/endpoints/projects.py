@@ -69,7 +69,6 @@ async def delete_project(
     project_id: int,
     current_user: User = Depends(deps.get_current_user),
 ) -> Any:
-    # Soft delete
     query = select(Project).filter(Project.id == project_id, Project.owner_id == current_user.id, Project.is_deleted == False)
     result = await db.execute(query)
     project = result.scalars().first()

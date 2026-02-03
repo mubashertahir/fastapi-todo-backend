@@ -18,7 +18,6 @@ router = APIRouter()
 async def login_access_token(
     db: AsyncSession = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
-    # Try to authenticate by username
     result = await db.execute(select(User).filter(User.username == form_data.username))
     user = result.scalars().first()
     
@@ -39,7 +38,6 @@ async def register(
     db: AsyncSession = Depends(deps.get_db),
     user_in: UserCreate,
 ) -> Any:
-    # Check email
     result = await db.execute(select(User).filter(User.email == user_in.email))
     if result.scalars().first():
         raise HTTPException(
@@ -47,7 +45,6 @@ async def register(
             detail="The user with this email already exists",
         )
     
-    # Check username
     result = await db.execute(select(User).filter(User.username == user_in.username))
     if result.scalars().first():
         raise HTTPException(

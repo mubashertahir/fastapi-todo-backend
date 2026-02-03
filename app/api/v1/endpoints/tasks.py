@@ -41,7 +41,6 @@ async def create_task(
     current_user: User = Depends(deps.get_current_user),
     background_tasks: BackgroundTasks,
 ) -> Any:
-    # Check if project exists and belongs to user if project_id is provided
     if task_in.project_id is not None:
         result = await db.execute(select(Project).filter(Project.id == task_in.project_id, Project.owner_id == current_user.id))
         project = result.scalars().first()
@@ -61,11 +60,8 @@ async def create_task(
     await db.commit()
     await db.refresh(task)
 
-    # Background task example
-    # Background task example: send email if due_date is tomorrow (within 24 hours)
     if task.due_date:
         now = datetime.now(task.due_date.tzinfo)
-        # Check if due date is in the future but less than 24 hours from now
         if now < task.due_date < now + timedelta(days=1):
             background_tasks.add_task(send_email_notification, current_user.email, f"Task '{task.title}' created and is due soon (tomorrow)!")
 
@@ -89,7 +85,6 @@ async def update_task(
     if task.owner_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to update this task")
 
-    # Validate project_id if provided
     if task_in.project_id is not None:
         result = await db.execute(select(Project).filter(Project.id == task_in.project_id, Project.owner_id == current_user.id))
         project = result.scalars().first()

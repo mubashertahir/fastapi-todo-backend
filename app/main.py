@@ -7,11 +7,9 @@ from app.db.base import Base
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Create tables
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
-    # Shutdown
 
 app = FastAPI(
     title=settings.PROJECT_NAME,

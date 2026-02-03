@@ -7,11 +7,6 @@ from app.main import app
 from app.db.base import Base
 from app.core.config import settings
 
-# Use an in-memory SQLite database for testing or a separate test DB
-# For this task, we can use the same Postgres but with a different DB name or just mocked.
-# But since we have docker-compose, we can just use the running DB but creates tables.
-# To stay simple and safe, I will use sqlite+aiosqlite for tests.
-
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
 engine = create_async_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
@@ -39,7 +34,6 @@ async def client(db_session):
     async def override_get_db():
         yield db_session
 
-    # simpler overriding by function
     from app.db.session import get_db
     app.dependency_overrides[get_db] = override_get_db
     
